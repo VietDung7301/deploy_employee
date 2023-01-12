@@ -1,0 +1,50 @@
+<div class="header">
+  <div class="nav">
+    <ul class="nav-list">
+      <li class="nav-item">
+        <a routerLink="dashboard"><i class="fa-solid fa-house"></i>Trang chủ</a>
+      </li>
+      <!-- <li class="nav-item">
+        <a routerLink="product-list">
+          <i class="fa-solid fa-list"></i>Danh sách đơn hàng
+        </a>
+      </li> -->
+      <li class="nav-item">
+        <a routerLink="rate-list">
+          <i class="fa-solid fa-reply"></i>Danh sách đánh giá
+        </a>
+      </li>
+      <!-- <li class="nav-item">
+        <a routerLink="request">
+          <i class="fa-solid fa-question-circle"></i>Trợ giúp
+        </a>
+      </li> -->
+    </ul>
+    <ul class="user-info">
+      <li class="nav-item nav-avatar">
+        <img
+          src="https://i.postimg.cc/Z5wQKJmh/fchunters.png"
+          alt="Avatar"
+          class="nav-avatar__img"
+        />
+        <b class="nav-avatar__name">Hệ thống bán hàng</b>
+        <i class="fa-solid fa-caret-down"></i>
+        <ul>
+          <li>
+            <a routerLink="personal-information"
+              ><i class="fa-solid fa-user"></i>Thông tin cá nhân</a
+            >
+          </li>
+          <li>
+            <a routerLink="../home"
+              ><i class="fa-solid fa-right-from-bracket"></i>Đăng xuất</a
+            >
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="container">
+  <router-outlet></router-outlet>
+</div>

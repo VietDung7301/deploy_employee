@@ -1,0 +1,188 @@
+<div class="container">
+  <div class="page-title">
+    <b>Danh sách đánh giá</b>
+  </div>
+  <div class="page-search">
+    <div nz-row nzGutter="8">
+      <div nz-col nzSpan="8">
+        <input nz-input type="text" placeholder="Tìm kiếm đánh giá..." />
+      </div>
+      <div nz-col nzSpan="4">
+        <button nz-button>Tìm kiếm</button>
+      </div>
+    </div>
+  </div>
+  <div class="page-content">
+    <nz-table #basicTable [nzData]="listOfData" [nzBordered]="true">
+      <thead>
+        <tr>
+          <th rowspan="2" [nzAlign]="'center'" nzWidth="3%">STT</th>
+          <th rowspan="2" [nzAlign]="'center'">Thời gian</th>
+          <th colspan="3">Thông tin đánh giá</th>
+          <th
+            rowspan="2"
+            [nzAlign]="'center'"
+            [nzShowFilter]="true"
+            [nzFilterMultiple]="true"
+            [nzFilterFn]="filterFnStatus"
+            [nzFilters]="listOfFilterStatus"
+          >
+            Trạng thái
+          </th>
+          <th rowspan="2" [nzAlign]="'center'">Hành động</th>
+        </tr>
+        <tr>
+          <th [nzAlign]="'center'">Sản phẩm</th>
+          <th [nzAlign]="'center'">Đánh giá</th>
+          <th
+            [nzAlign]="'center'"
+            [nzShowFilter]="true"
+            [nzFilterMultiple]="true"
+            [nzFilterFn]="filterFnStar"
+            [nzFilters]="listOfFilterStar"
+            [nzShowSort]="true"
+            [nzSortFn]="sortFnStar"
+          >
+            Số sao
+          </th>
+          <!-- <th [nzAlign]="'center'">Người dùng</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let data of basicTable.data; let i = index"
+          (click)="openDrawer(data)"
+        >
+          <td>{{ i + 1 }}</td>
+          <td>{{ data.postDate | date : "dd/MM/yyyy" }}</td>
+          <td>
+            <img [src]="data.productImageUrl" alt="" height="50px" />
+            {{ data.productName }}
+          </td>
+          <td>{{ data.message }}</td>
+          <td>
+            <nz-rate [ngModel]="data.starNumbers" [nzDisabled]="true"></nz-rate>
+          </td>
+          <!-- <td>{{data.userName}}</td> -->
+          <td class="text-center">
+            <ng-container [ngSwitch]="data.status">
+              <nz-tag *ngSwitchCase="RateStatus.NotYet" [nzColor]="'blue'"
+                >Chưa xử lý</nz-tag
+              >
+              <nz-tag *ngSwitchCase="RateStatus.RequestHide" [nzColor]="'red'"
+                >Đã yêu cầu ẩn comment</nz-tag
+              >
+              <nz-tag
+                *ngSwitchCase="RateStatus.RequestSolve"
+                [nzColor]="'green'"
+                >Đã yêu cầu giải quyết</nz-tag
+              >
+            </ng-container>
+          </td>
+          <td class="text-center">
+            <button
+              *ngIf="data.status != RateStatus.RequestSolve"
+              nz-button
+              nz-tooltip
+              nzTooltipTitle="Thêm vào vấn đề cần giải quyết"
+              (click)="$event.stopPropagation(); showSolveCommentModal(data)"
+            >
+              <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
+            </button>
+            <button
+              *ngIf="data.status != RateStatus.RequestHide"
+              nz-button
+              nzDanger
+              nz-tooltip
+              nzTooltipTitle="Yêu cầu ẩn comment"
+              (click)="$event.stopPropagation(); showHideCommentModal(data)"
+            >
+              <span nz-icon nzType="eye-invisible" nzTheme="outline"></span>
+            </button>
+            <button
+              *ngIf="data.status != RateStatus.NotYet"
+              nz-button
+              (click)="$event.stopPropagation()"
+              nzType="dashed"
+              nzDanger
+              nz-tooltip
+              nzTooltipTitle="Hủy yêu cầu {{
+                data.status == RateStatus.RequestSolve
+                  ? 'Giải quyết'
+                  : 'ẩn comment'
+              }}"
+              nz-popconfirm
+              nzPopconfirmTitle="Xác nhận hủy yêu cầu {{
+                data.status == RateStatus.RequestSolve
+                  ? 'Giải quyết'
+                  : 'ẩn comment'
+              }}?"
+              nzPopconfirmPlacement="bottom"
+              (nzOnConfirm)="sendCancelRequest(data)"
+              [nzOkText]="'Gửi'"
+            >
+              <span nz-icon nzType="close-square" nzTheme="outline"></span>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </div>
+</div>
+
+<app-rate-detail-drawer #rateDetailDrawer></app-rate-detail-drawer>
+
+<nz-modal
+  [(nzVisible)]="isVisibleSolveCommentModal"
+  nzTitle="Gửi yêu cầu giải quyết comment này?"
+  (nzOnCancel)="handleCancel()"
+>
+  <ng-container *nzModalContent>
+    <div nz-row [nzGutter]="[8, 8]">
+      <div nz-col nzSpan="8">Loại vấn đề:</div>
+      <div nz-col nzSpan="16">
+        <nz-select nzPlaceHolder="Chọn loại vấn đề" style="width: 100%">
+          <nz-option nzValue="1" nzLabel="Giao, nhận hàng"></nz-option>
+          <nz-option nzValue="2" nzLabel="Đổi trả"></nz-option>
+          <nz-option nzValue="3" nzLabel="Thanh toán"></nz-option>
+          <nz-option nzValue="4" nzLabel="Góp ý appWeb"></nz-option>
+          <nz-option nzValue="0" nzLabel="Vấn đề khác"></nz-option>
+        </nz-select>
+      </div>
+    </div>
+    <div nz-row [nzGutter]="[8, 8]">
+      <div nz-col nzSpan="8">Mô tả ngắn gọn:</div>
+      <div nz-col nzSpan="16">
+        <input nz-input placeholder="Nhập mô tả" />
+      </div>
+    </div>
+
+    <div nz-row [nzGutter]="[8, 8]">
+      <div nz-col nzSpan="8">Comment:</div>
+      <div nz-col nzSpan="16">
+        <input nz-input placeholder="Nhập comment" />
+      </div>
+    </div>
+  </ng-container>
+  <div *nzModalFooter>
+    <button nz-button nzType="primary" (click)="sendSolveCommentRequest()">
+      Gửi
+    </button>
+  </div>
+</nz-modal>
+
+<nz-modal
+  [(nzVisible)]="isVisibleHideCommentModal"
+  nzTitle="Gửi yêu cầu ẩn comment này?"
+  (nzOnCancel)="handleCancel()"
+>
+  <ng-container *nzModalContent>
+    <p>Nhập lý do yêu cầu ẩn comment:</p>
+    <textarea rows="4" nz-input></textarea>
+  </ng-container>
+  <div *nzModalFooter>
+    <button nz-button nzType="primary" (click)="sendHideCommentRequest()">
+      Gửi
+    </button>
+  </div>
+</nz-modal>

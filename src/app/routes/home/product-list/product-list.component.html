@@ -1,0 +1,406 @@
+<nz-tabset>
+  <nz-tab nzTitle="Tất cả">
+    <ng-container *ngTemplateOutlet="allOrder"></ng-container>
+  </nz-tab>
+  <nz-tab nzTitle="Đang giao hàng">
+    <ng-container *ngTemplateOutlet="shippingOrder"></ng-container>
+  </nz-tab>
+  <nz-tab nzTitle="Đã giao">
+    <ng-container *ngTemplateOutlet="doneOrder"></ng-container>
+  </nz-tab>
+</nz-tabset>
+
+<ng-template #allOrder>
+  <div class="order__list">
+    <div
+      class="order__detail small-border p-12 mb-12"
+      *ngFor="let order of orderList"
+    >
+      <div class="order__head flr pb-12">
+        <div class="left-info flr">
+          <div class="shop__icon"><i class="fa-solid fa-store"></i></div>
+          <div class="shop__name small-label ml-12">
+            Hệ thống bán hàng Lập trình cấu trúc
+          </div>
+        </div>
+        <div class="right-info flr">
+          <div
+            class="order-status__icon"
+            [ngClass]="{
+              'order-status__icon--success': order.status == 'done'
+            }"
+          >
+            <i class="fa-solid fa-truck"></i>
+          </div>
+          <div
+            class="order-status__text ml-12"
+            [ngClass]="{
+              'order-status__text--success': order.status == 'done'
+            }"
+          >
+            {{ getOrderStatusLabel(order.status) }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="order__body mt-12 mb-12"
+        *ngFor="let product of order.products; let i = index"
+      >
+        <a routerLink="../order-detail" [queryParams]="{orderId: order.orderId}"><div class="product-detail flr">
+          <div class="product__img">
+            <img
+              [src]="product.productImageUrl"
+              alt="ảnh sản phẩm"
+              height="100"
+            />
+          </div>
+          <div class="product__info ml-12">
+            <div class="product__name small-label">
+              {{ product.productName }}
+            </div>
+            <div class="product__description">
+              {{ product.description }}
+            </div>
+          </div>
+        </div></a>
+        <div class="order__footer">
+          <div class="rate-zone">
+            <div class="total-cost"></div>
+            <div class="rate-body flr">
+              <div class="left-side">
+                <div class="rate__time">
+                  Đánh giá sản phẩm trước
+                  {{ order.orderTime | date: "dd/MM/yyyy" }}
+                </div>
+              </div>
+              <div class="right-side">
+                <div class="rate__detail flr">
+                  <div class="rate-button">
+                    <button
+                      class="default-button mr-12"
+                      (click)="open(order.id, product.productId)"
+                      *ngIf="order.status == 'Đã giao hàng'"
+                    >
+                      Đánh giá
+                    </button>
+                  </div>
+                  <div class="contact-button">
+                    <button *ngIf="order.status == 'Hoàn thành'" class="second-button mr-12" (click)="open(order.id, product.productId)">Xem đánh giá</button>
+                  </div>
+                  <div class="contact-button">
+                    <button class="second-button mr-12">Liên hệ</button>
+                  </div>
+                  <div class="buy-againt-button">
+                    <button class="second-button">Mua lại</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="more-product-button text-center">
+        <a
+          (click)="createMessage('success', 'Chuyển đến màn chi tiết đơn hàng')"
+          >Xem thêm sản phẩm khác</a
+        >
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #shippingOrder>
+  <div class="order__list">
+    <div
+      class="order__detail small-border p-12 mb-12"
+      *ngFor="let order of shippingOrderList"
+    >
+      <div class="order__head flr pb-12">
+        <div class="left-info flr">
+          <div class="shop__icon"><i class="fa-solid fa-store"></i></div>
+          <div class="shop__name small-label ml-12">
+            Hệ thống bán hàng Lập trình cấu trúc
+          </div>
+        </div>
+        <div class="right-info flr">
+          <div class="order-status__icon">
+            <i class="fa-solid fa-truck"></i>
+          </div>
+          <div class="order-status__text ml-12">
+            {{ getOrderStatusLabel(order.status) }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="order__body mt-12 mb-12"
+        *ngFor="let product of order.productList; let i = index"
+      >
+        <div class="product-detail flr">
+          <div class="product__img">
+            <img
+              [src]="product.productImageUrl"
+              alt="khan lau kinh"
+              height="100"
+            />
+          </div>
+          <div class="product__info ml-12">
+            <div class="product__name small-label">
+              {{ product.productName }}
+            </div>
+            <div class="product__description">{{ product.description }}</div>
+          </div>
+        </div>
+        <div class="order__footer">
+          <div class="rate-zone">
+            <div class="total-cost"></div>
+            <div class="rate-body flr">
+              <div class="left-side">
+                <div class="rate__time">
+                  Đánh giá sản phẩm trước
+                  {{ order.orderTime | date: "dd/MM/yyyy" }}
+                </div>
+              </div>
+              <div class="right-side">
+                <div class="rate__detail flr">
+                  <div class="rate-button">
+                    <button
+                      class="default-button mr-12"
+                      (click)="open(order.id, product.productId)"
+                      *ngIf="order.status == 'done'"
+                    >
+                      Đánh giá
+                    </button>
+                  </div>
+                  <div class="contact-button">
+                    <button class="second-button mr-12">Liên hệ</button>
+                  </div>
+                  <div class="buy-againt-button">
+                    <button class="second-button">Mua lại</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="more-product-button text-center">
+          <a
+            (click)="
+              createMessage('success', 'Chuyển đến màn chi tiết đơn hàng')
+            "
+            >Xem thêm sản phẩm khác</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #doneOrder>
+  <div class="order__list">
+    <div
+      class="order__detail small-border p-12 mb-12"
+      *ngFor="let order of doneOrderList"
+    >
+      <div class="order__head flr pb-12">
+        <div class="left-info flr">
+          <div class="shop__icon"><i class="fa-solid fa-store"></i></div>
+          <div class="shop__name small-label ml-12">
+            Hệ thống bán hàng Lập trình cấu trúc
+          </div>
+        </div>
+        <div class="right-info flr">
+          <div class="order-status__icon order-status__icon--success">
+            <i class="fa-solid fa-truck"></i>
+          </div>
+          <div class="order-status__text order-status__text--success ml-12">
+            {{ getOrderStatusLabel(order.status) }}
+          </div>
+        </div>
+      </div>
+      <div
+        class="order__body mt-12 mb-12"
+        *ngFor="let product of order.productList; let i = index"
+      >
+        <div class="product-detail flr">
+          <div class="product__img">
+            <img
+              [src]="product.productImageUrl"
+              alt="khan lau kinh"
+              height="100"
+            />
+          </div>
+          <div class="product__info ml-12">
+            <div class="product__name small-label">
+              {{ product.productName }}
+            </div>
+            <div class="product__description">{{ product.description }}</div>
+          </div>
+        </div>
+        <div class="order__footer">
+          <div class="rate-zone">
+            <div class="total-cost"></div>
+            <div class="rate-body flr">
+              <div class="left-side">
+                <div class="rate__time">
+                  Đánh giá sản phẩm trước
+                  {{ order.orderTime | date: "dd/MM/yyyy" }}
+                </div>
+              </div>
+              <div class="right-side">
+                <div class="rate__detail flr">
+                  <div class="rate-button">
+                    <button
+                      class="default-button mr-12"
+                      (click)="open(order.id, product.productId)"
+                      *ngIf="order.status == 'done'"
+                    >
+                      Đánh giá
+                    </button>
+                  </div>
+                  <div class="contact-button">
+                    <button class="second-button mr-12">Liên hệ</button>
+                  </div>
+                  <div class="buy-againt-button">
+                    <button class="second-button">Mua lại</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="more-product-button text-center">
+          <a
+            (click)="
+              createMessage('success', 'Chuyển đến màn chi tiết đơn hàng')
+            "
+            >Xem thêm sản phẩm khác</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<nz-drawer
+  [nzClosable]="false"
+  [nzVisible]="visible"
+  nzWidth="40%"
+  nzPlacement="right"
+  nzTitle="Đánh giá sản phẩm"
+  [nzFooter]="footer"
+  (nzOnClose)="close()"
+>
+  <ng-container *nzDrawerContent>
+    <div class="drawer-container">
+      <div class="detail-vote small-border p-12">
+        <div class="product-detail flr">
+          <div class="product__img">
+            <img
+              [src]="currentProduct.productImageUrl"
+              alt="ảnh sản phẩm"
+              height="100"
+            />
+          </div>
+          <div class="product__info ml-12">
+            <div class="product__name small-label">
+              {{ currentProduct.productName }}
+            </div>
+            <div class="product__description">
+              {{ currentProduct.description }}
+            </div>
+          </div>
+        </div>
+        <!-- <form -->
+        <!-- #rateProduct="ngForm"
+          (ngSubmit)="
+            sendProductRate(
+              currentOrder.id,
+              currentProduct.productId,
+              rateProduct.value,
+              imgRate.files
+            )
+          "
+          enctype="multipart/form-data"
+        > -->
+        <div class="star-vote flr mb-12">
+          <div class="star-vote__label mr-24">Chất lượng sản phẩm</div>
+          <div class="star-vote__icon">
+            <nz-rate [(ngModel)]="currentProductStarRate"></nz-rate>
+          </div>
+        </div>
+        <div class="text-vote" nz-row>
+          <div class="text-vote__label" nz-col [nzSpan]="7">
+            Đánh giá chi tiết
+          </div>
+          <div class="text-vote__input" nz-col [nzSpan]="17">
+            <textarea
+              nz-input
+              placeholder="Để lại đánh giá của bạn"
+              [(ngModel)]="currentProductMessageRate"
+              [nzAutosize]="{ minRows: 3, maxRows: 6 }"
+            ></textarea>
+          </div>
+          <!-- <div class="image-vote">
+            <i class="fa-solid fa-camera image-vote_icon"></i>
+            <p class="image-vote_text">Thêm hình ảnh</p>
+          </div> -->
+          <div class="clearfix mt-12">
+            <nz-upload
+              nzAction="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+              nzListType="picture-card"
+              [(nzFileList)]="fileList"
+              [nzShowButton]="fileList.length < 4"
+              [nzPreview]="handlePreview"
+            >
+              <div>
+                <i class="fa-solid fa-camera image-vote_icon"></i>
+                <!-- <span nz-icon nzType="plus"></span> -->
+                <div style="margin-top: 8px">Thêm hình ảnh</div>
+              </div>
+            </nz-upload>
+            <nz-modal
+              [nzVisible]="previewVisible"
+              [nzContent]="modalContent"
+              [nzFooter]="null"
+              (nzOnCancel)="previewVisible = false"
+            >
+              <ng-template #modalContent>
+                <img [src]="previewImage" [ngStyle]="{ width: '100%' }" />
+              </ng-template>
+            </nz-modal>
+          </div>
+        </div>
+        <!-- <div>
+            <input type="file" #imgRate />
+          </div> -->
+        <!-- <div>
+          <input type="submit" value="Submit" />
+        </div> -->
+        <!-- </form> -->
+      </div>
+    </div>
+
+    <!-- <form
+      action="http://localhost:3000/files"
+      method="post"
+      enctype="multipart/form-data"
+    >
+      <input type="text" name="name" />
+      <input type="text" name="pass" />
+      <input type="file" name="photos" multiple /><br /><br />
+      <input type="submit" />
+    </form> -->
+  </ng-container>
+</nz-drawer>
+
+<ng-template #footer>
+  <div class="action-buttons flr">
+    <button class="second-button mr-12" (click)="close()">Hủy bỏ</button>
+    <button
+      class="default-button"
+      (click)="sendProductRate(currentOrder.id, currentProduct.productId)"
+    >
+      Hoàn tất
+    </button>
+  </div>
+</ng-template>
